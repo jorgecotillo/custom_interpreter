@@ -1,0 +1,13 @@
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\bin\Debug\netcoreapp3.1\CLex.exe
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\bin\Debug\netcoreapp3.1\CLex.deps.json
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\bin\Debug\netcoreapp3.1\CLex.runtimeconfig.json
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\bin\Debug\netcoreapp3.1\CLex.runtimeconfig.dev.json
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\bin\Debug\netcoreapp3.1\CLex.dll
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\bin\Debug\netcoreapp3.1\CLex.pdb
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.csprojAssemblyReference.cache
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.AssemblyInfoInputs.cache
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.AssemblyInfo.cs
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.csproj.CoreCompileInputs.cache
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.dll
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.pdb
+C:\Users\Jorge Cotillo\source\repos\CLex\CLex\obj\Debug\netcoreapp3.1\CLex.genruntimeconfig.cache
