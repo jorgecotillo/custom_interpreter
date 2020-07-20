@@ -1,5 +1,7 @@
 ﻿using CLex.Expressions;
+using CLex.Statements;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -45,14 +47,17 @@ namespace CLex
         {
             try
             {
+                // Reset flags
+                HadError = false;
+                HadRuntimeError = false;
+
                 var fileContent = File.ReadAllText(path: filePath);
                 Run(fileContent);
-
             }
             catch (Exception ex)
             {
                 Error(line: 10, message: ex.Message);
-                Environment.Exit(65);
+                System.Environment.Exit(65);
             }
 
         }
@@ -64,6 +69,10 @@ namespace CLex
                 Console.Write("> ");
                 try
                 {
+                    // Reset flags
+                    HadError = false;
+                    HadRuntimeError = false;
+
                     Run(Console.ReadLine());
                 }
                 catch (Exception ex)
@@ -76,18 +85,19 @@ namespace CLex
 
         internal static void Run(string content)
         {
+
             var scanner = new Scanner(content);
             var tokens = scanner.ScanTokens();
 
             Parser parser = new Parser(tokens);
-            Expr expression = parser.Parse();
+            List<Stmt> statements = parser.Parse();
 
             // Stop if there was a syntax error.
             if (HadError) return;
             if (HadRuntimeError) return;
 
             //Console.WriteLine(new AstPrinter().Print(expression));
-            Interpreter.Interpret(expression);
+            Interpreter.Interpret(statements);
 
             //foreach (var token in tokens)
             //{
@@ -126,24 +136,24 @@ namespace CLex
 
         internal static void Report(int line, string where, string message)
         {
-            var errorMessage = $"jlox: Unexpected {message}, in {where} at line {line}";
+            var errorMessage = $"jlox: error: {message}, at line {line}";
             var errorStream = Console.OpenStandardError();
             var bytesErrorMessage = Encoding.ASCII.GetBytes(errorMessage);
             errorStream.Write(buffer: bytesErrorMessage, offset: 0, count: bytesErrorMessage.Length);
 
             HadError = true;
-            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine(System.Environment.NewLine);
         }
 
         internal static void RuntimeError(RuntimeError error)
         {
-            var errorMessage = $"jlox: Unexpected {error.Message}, at line {error.Token.Line}";
+            var errorMessage = $"jlox: error: {error.Message}, at line {error.Token.Line}";
             var errorStream = Console.OpenStandardError();
             var bytesErrorMessage = Encoding.ASCII.GetBytes(errorMessage);
             errorStream.Write(buffer: bytesErrorMessage, offset: 0, count: bytesErrorMessage.Length);
 
             HadRuntimeError = true;
-            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine(System.Environment.NewLine);
         }
     }
 }

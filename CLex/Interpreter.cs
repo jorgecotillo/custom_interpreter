@@ -2,18 +2,23 @@
 using CLex.Statements;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace CLex
 {
     internal class Interpreter : Expressions.IVisitor<object>, Statements.IVisitor<object>
     {
-        public void Interpret(Expr expression)
+        private Environment environment = new Environment();
+
+        public void Interpret(List<Stmt> statements)
         {
             try
             {
-                object value = Evaluate(expression);
-                Console.WriteLine(Stringify(value));
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeError error)
             {
@@ -148,7 +153,7 @@ namespace CLex
 
         object Statements.IVisitor<object>.VisitExpressionStmt(Expression stmt)
         {
-            //Evaluate(stmt.Expression);
+            Evaluate(stmt.Expr);
             return null;
         }
 
@@ -164,8 +169,8 @@ namespace CLex
 
         object Statements.IVisitor<object>.VisitPrintStmt(Print stmt)
         {
-            //object value = Evaluate(stmt.Expression);
-            //Console.WriteLine(value);
+            object value = Evaluate(stmt.Expr);
+            Console.WriteLine(Stringify(value));
             return null;
         }
 
@@ -299,6 +304,68 @@ namespace CLex
             if (left is double && right is double) return;
 
             throw new RuntimeError(op, "Operands must be numbers.");
+        }
+
+        private void Execute(Stmt stmt)
+        {
+            stmt.Accept(this);
+        }
+
+        object Statements.IVisitor<object>.VisitVarStmt(Statements.Var stmt)
+        {
+            object value = null;
+            if (stmt.Initializer != null)
+            {
+                value = Evaluate(stmt.Initializer);
+            }
+
+            environment.Define(stmt.Name.Lexeme, value);
+            return null;
+        }
+
+        object Expressions.IVisitor<object>.VisitVariableExpr(Variable expr)
+        {
+            return environment.Get(expr.Name);
+        }
+
+        object Expressions.IVisitor<object>.VisitAssignExpr(Assign expr)
+        {
+            object value = Evaluate(expr.Value);
+            environment.Assign(expr.Name, value);
+            return value;
+        }
+
+        object Expressions.IVisitor<object>.VisitGetExpr(Get get)
+        {
+            throw new NotImplementedException();
+        }
+
+        object Expressions.IVisitor<object>.VisitCallExpr(Call call)
+        {
+            throw new NotImplementedException();
+        }
+
+        object Statements.IVisitor<object>.VisitBlockStmt(Block stmt)
+        {
+            ExecuteBlock(stmt.Statements, new Environment(environment));
+            return null;
+        }
+
+        void ExecuteBlock(List<Stmt> statements, Environment environment)
+        {
+            Environment previous = this.environment;
+            try
+            {
+                this.environment = environment;
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                this.environment = previous;
+            }
         }
     }
 }

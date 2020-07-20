@@ -8,5 +8,7 @@ namespace CLex.Statements
     {
         R VisitPrintStmt(Print stmt);
         R VisitExpressionStmt(Expression stmt);
+        R VisitVarStmt(Var stmt);
+        R VisitBlockStmt(Block stmt);
     }
 }

@@ -12,9 +12,24 @@ namespace CLex
             return expr.Accept(this);
         }
 
+        public string VisitAssignExpr(Assign expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitBinaryExpr(Binary expr)
         {
             return Parenthesize(name: expr.Operator.Lexeme, exprs: new Expr[2] { expr.Left, expr.Right });
+        }
+
+        public string VisitCallExpr(Call call)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitGetExpr(Get get)
+        {
+            throw new NotImplementedException();
         }
 
         public string VisitGroupingExpr(Grouping expr)
@@ -57,6 +72,36 @@ namespace CLex
             builder.Append(")");
 
             return builder.ToString();
+        }
+
+        string IVisitor<string>.VisitBinaryExpr(Binary expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IVisitor<string>.VisitGroupingExpr(Grouping expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IVisitor<string>.VisitLiteralExpr(Literal expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IVisitor<string>.VisitTernaryExpr(Ternary expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IVisitor<string>.VisitUnaryExpr(Unary expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IVisitor<string>.VisitVariableExpr(Variable expr)
+        {
+            throw new NotImplementedException();
         }
     }
 }

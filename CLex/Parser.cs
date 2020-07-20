@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Xml.Linq;
 
 namespace CLex
 {
@@ -18,19 +19,17 @@ namespace CLex
             this.Tokens = tokens;
         }
 
-        //public List<Stmt> Parse()
-        public Expr Parse()
+        public List<Stmt> Parse()
         {
             try
             {
-                //List<Stmt> statements = new List<Stmt>();
-                //while (!IsAtEnd())
-                //{
-                //    statements.Add(Statement());
-                //}
+                List<Stmt> statements = new List<Stmt>();
+                while (!IsAtEnd())
+                {
+                    statements.Add(Declaration());
+                }
 
-                //return statements;
-                return Expression();
+                return statements;
             }
             catch (ParseError)
             {
@@ -38,33 +37,103 @@ namespace CLex
             }
         }
 
-        //private Stmt Statement()
-        //{
-        //    if (Match(TokenType.PRINT))
-        //    {
-        //        return PrintStatement();
-        //    }
+        private Stmt Declaration()
+        {
+            try
+            {
+                if(Match(TokenType.VAR))
+                {
+                    return VarDeclaration();
+                }
 
-        //    return ExpressionStatement();
-        //}
+                return Statement();
+            }
+            catch (ParseError error)
+            {
+                Synchronize();
+                return null;
+            }
+        }
 
-        //private Stmt PrintStatement()
-        //{
-        //    Expr value = Expression();
-        //    Consume(TokenType.SEMICOLON, "Expect ';' after value.");
-        //    return new Stmt.Print(value);
-        //}
+        private Stmt VarDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
 
-        //private Stmt ExpressionStatement()
-        //{
-        //    Expr expr = Expression();
-        //    Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
-        //    return new Stmt.Expression(expr);
-        //}
+            Expr initializer = null;
+            if (Match(TokenType.EQUAL))
+            {
+                initializer = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            return new Statements.Var(name, initializer);
+        }
+
+        private Stmt Statement()
+        {
+            if (Match(TokenType.PRINT))
+            {
+                return PrintStatement();
+            }
+            if (Match(TokenType.LEFT_BRACE))
+            {
+                return new Statements.Block(Block());
+            }
+
+            return ExpressionStatement();
+        }
+
+        private Stmt PrintStatement()
+        {
+            Expr value = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value");
+            return new Statements.Print(value);
+        }
+
+        private Stmt ExpressionStatement()
+        {
+            Expr expr = Expression();
+            Consume(TokenType.SEMICOLON, "Expect ';' after expression");
+            return new Statements.Expression(expr);
+        }
+
+        private List<Stmt> Block()
+        {
+            List<Stmt> statements = new List<Stmt>();
+
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
+        }
 
         private Expr Expression()
         {
-            return Equality();
+            return Assignment();
+        }
+
+        private Expr Assignment()
+        {
+            Expr expr = Equality();
+
+            if (Match(TokenType.EQUAL))
+            {
+                Token equals = Previous();
+                Expr value = Assignment();
+
+                if (expr is Expressions.Variable var)
+                {
+                    Token name = var.Name;
+                    return new Expressions.Assign(name, value);
+                }
+
+                Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
         }
 
         private Expr Equality()
@@ -191,6 +260,11 @@ namespace CLex
             if (Match(TokenType.NUMBER, TokenType.STRING))
             {
                 return new Literal(Previous().Literal);
+            }
+
+            if (Match(TokenType.IDENTIFIER))
+            {
+                return new Expressions.Variable(Previous());
             }
 
             if (Match(TokenType.LEFT_PAREN))
