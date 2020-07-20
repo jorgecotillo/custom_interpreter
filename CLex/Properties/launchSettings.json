@@ -1,8 +1,7 @@
 {
   "profiles": {
     "CLex": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\source_code\\arm-templates\\vnet.bcp"
+      "commandName": "Project"
     }
   }
 }

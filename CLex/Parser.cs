@@ -1,4 +1,5 @@
 ﻿using CLex.Expressions;
+using CLex.Statements;
 using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,18 @@ namespace CLex
             this.Tokens = tokens;
         }
 
+        //public List<Stmt> Parse()
         public Expr Parse()
         {
             try
             {
+                //List<Stmt> statements = new List<Stmt>();
+                //while (!IsAtEnd())
+                //{
+                //    statements.Add(Statement());
+                //}
+
+                //return statements;
                 return Expression();
             }
             catch (ParseError)
@@ -28,6 +37,30 @@ namespace CLex
                 return null;
             }
         }
+
+        //private Stmt Statement()
+        //{
+        //    if (Match(TokenType.PRINT))
+        //    {
+        //        return PrintStatement();
+        //    }
+
+        //    return ExpressionStatement();
+        //}
+
+        //private Stmt PrintStatement()
+        //{
+        //    Expr value = Expression();
+        //    Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        //    return new Stmt.Print(value);
+        //}
+
+        //private Stmt ExpressionStatement()
+        //{
+        //    Expr expr = Expression();
+        //    Consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        //    return new Stmt.Expression(expr);
+        //}
 
         private Expr Expression()
         {
@@ -172,7 +205,10 @@ namespace CLex
 
         private Token Consume(TokenType type, string message)
         {
-            if (Check(type)) return Advance();
+            if (Check(type))
+            {
+                return Advance();
+            }
 
             throw Error(Peek(), message);
         }

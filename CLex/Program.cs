@@ -38,6 +38,8 @@ namespace CLex
     internal class Lox
     {
         private static bool HadError;
+        private static bool HadRuntimeError;
+        private static readonly Interpreter Interpreter = new Interpreter();
 
         internal static void RunFile(string filePath)
         {
@@ -82,8 +84,10 @@ namespace CLex
 
             // Stop if there was a syntax error.
             if (HadError) return;
+            if (HadRuntimeError) return;
 
-            Console.WriteLine(new AstPrinter().Print(expression));
+            //Console.WriteLine(new AstPrinter().Print(expression));
+            Interpreter.Interpret(expression);
 
             //foreach (var token in tokens)
             //{
@@ -126,7 +130,19 @@ namespace CLex
             var errorStream = Console.OpenStandardError();
             var bytesErrorMessage = Encoding.ASCII.GetBytes(errorMessage);
             errorStream.Write(buffer: bytesErrorMessage, offset: 0, count: bytesErrorMessage.Length);
+
             HadError = true;
+            Console.WriteLine(Environment.NewLine);
+        }
+
+        internal static void RuntimeError(RuntimeError error)
+        {
+            var errorMessage = $"jlox: Unexpected {error.Message}, at line {error.Token.Line}";
+            var errorStream = Console.OpenStandardError();
+            var bytesErrorMessage = Encoding.ASCII.GetBytes(errorMessage);
+            errorStream.Write(buffer: bytesErrorMessage, offset: 0, count: bytesErrorMessage.Length);
+
+            HadRuntimeError = true;
             Console.WriteLine(Environment.NewLine);
         }
     }
