@@ -367,5 +367,46 @@ namespace CLex
                 this.environment = previous;
             }
         }
+
+        object Statements.IVisitor<object>.VisitIfStmt(If stmt)
+        {
+            if (IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+            return null;
+        }
+
+        object Expressions.IVisitor<object>.VisitSetExpr(Set expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        object Expressions.IVisitor<object>.VisitLogicalExpr(Logical expr)
+        {
+            object left = Evaluate(expr.Left);
+
+            if (expr.Operator.Type == TokenType.OR) {
+                if (IsTruthy(left)) return left;
+            } else
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(expr.Right);
+        }
+
+        object Statements.IVisitor<object>.VisitWhileStmt(While stmt)
+        {
+            while (IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.Body);
+            }
+            return null;
+        }
     }
 }

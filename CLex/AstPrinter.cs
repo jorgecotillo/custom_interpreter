@@ -47,6 +47,16 @@ namespace CLex
             return expr.Value.ToString();
         }
 
+        public string VisitLogicalExpr(Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitSetExpr(Set expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitTernaryExpr(Ternary expr)
         {
             throw new NotImplementedException();

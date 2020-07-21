@@ -13,7 +13,9 @@ namespace CLex.Expressions
         R VisitTernaryExpr(Ternary expr);
         R VisitVariableExpr(Variable expr);
         R VisitAssignExpr(Assign expr);
-        R VisitGetExpr(Get get);
-        R VisitCallExpr(Call call);
+        R VisitGetExpr(Get expr);
+        R VisitCallExpr(Call expr);
+        R VisitSetExpr(Set expr);
+        R VisitLogicalExpr(Logical expr);
     }
 }

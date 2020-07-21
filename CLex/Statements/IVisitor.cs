@@ -10,5 +10,7 @@ namespace CLex.Statements
         R VisitExpressionStmt(Expression stmt);
         R VisitVarStmt(Var stmt);
         R VisitBlockStmt(Block stmt);
+        R VisitIfStmt(If stmt);
+        R VisitWhileStmt(While stmt);
     }
 }

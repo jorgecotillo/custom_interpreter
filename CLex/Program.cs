@@ -11,17 +11,6 @@ namespace CLex
     {
         static void Main(string[] args)
         {
-            //Expr expression = new Binary(
-            //    new Unary(
-            //        new Literal(123),
-            //        new Token(TokenType.MINUS, "-", null, 1)
-            //    ),
-            //    new Token(TokenType.STAR, "*", null, 1),
-            //    new Grouping(
-            //        new Literal(45.67)));
-
-            //Console.WriteLine(new AstPrinter().Print(expression));
-
             if (args.Length > 1)
             {
                 Console.WriteLine("Usage: jlox [script]");
@@ -95,26 +84,8 @@ namespace CLex
             // Stop if there was a syntax error.
             if (HadError) return;
             if (HadRuntimeError) return;
-
-            //Console.WriteLine(new AstPrinter().Print(expression));
+            
             Interpreter.Interpret(statements);
-
-            //foreach (var token in tokens)
-            //{
-            //    Console.WriteLine(token);
-            //}
-            /*var reader = new StringReader(content);
-
-            while(true)
-            {
-                var line = reader.ReadLine();
-                if (line == null)
-                {
-                    break;
-                }
-
-                Console.WriteLine(line);
-            }*/
         }
 
         internal static void Error(int line, string message)
