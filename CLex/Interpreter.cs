@@ -7,9 +7,31 @@ using System.Text;
 
 namespace CLex
 {
+    class Clock : ILoxCallable
+    {
+        public int Arity()
+        {
+            return 0;
+        }
+
+        public object Call(Interpreter interpreter, List<object> arguments)
+        {
+            return (double)System.DateTime.Now.Millisecond / 1000.0;
+        }
+
+        public override string ToString()
+        {
+            return "<system function>";
+        }
+    }
     internal class Interpreter : Expressions.IVisitor<object>, Statements.IVisitor<object>
     {
-        private Environment environment = new Environment();
+        public static Environment Globals { get { return new Environment(); } }
+        private Environment environment = Globals;
+
+        public Interpreter() {
+            Globals.Define("clock", new Clock());
+        }
 
         public void Interpret(List<Stmt> statements)
         {
@@ -50,18 +72,6 @@ namespace CLex
 
             switch (expr.Operator.Type)
             {
-                case TokenType.LEFT_PAREN:
-                    break;
-                case TokenType.RIGHT_PAREN:
-                    break;
-                case TokenType.LEFT_BRACE:
-                    break;
-                case TokenType.RIGHT_BRACE:
-                    break;
-                case TokenType.COMMA:
-                    break;
-                case TokenType.DOT:
-                    break;
                 case TokenType.MINUS:
                     CheckNumberOperands(expr.Operator, left, right);
                     return (double)left - (double)right;
@@ -75,21 +85,14 @@ namespace CLex
                     }
 
                     throw new RuntimeError(expr.Operator, "Operands must be two numbers or two strings.");
-
-                case TokenType.SEMICOLON:
-                    break;
                 case TokenType.SLASH:
                     CheckNumberOperands(expr.Operator, left, right);
                     return (double)left / (double)right;
                 case TokenType.STAR:
                     CheckNumberOperands(expr.Operator, left, right);
                     return (double)left * (double)right;
-                case TokenType.BANG:
-                    break;
                 case TokenType.BANG_EQUAL:
                     return !IsEqual(left, right);
-                case TokenType.EQUAL:
-                    break;
                 case TokenType.EQUAL_EQUAL:
                     return IsEqual(left, right);
                 case TokenType.GREATER:
@@ -103,52 +106,34 @@ namespace CLex
                 case TokenType.LESS_EQUAL:
                     CheckNumberOperands(expr.Operator, left, right);
                     return (double)left <= (double)right;
-                case TokenType.IDENTIFIER:
-                    break;
-                case TokenType.STRING:
-                    break;
-                case TokenType.NUMBER:
-                    break;
-                case TokenType.AND:
-                    break;
-                case TokenType.CLASS:
-                    break;
-                case TokenType.ELSE:
-                    break;
-                case TokenType.FALSE:
-                    break;
-                case TokenType.FUN:
-                    break;
-                case TokenType.FOR:
-                    break;
-                case TokenType.IF:
-                    break;
-                case TokenType.NIL:
-                    break;
-                case TokenType.OR:
-                    break;
-                case TokenType.PRINT:
-                    break;
-                case TokenType.RETURN:
-                    break;
-                case TokenType.SUPER:
-                    break;
-                case TokenType.THIS:
-                    break;
-                case TokenType.TRUE:
-                    break;
-                case TokenType.VAR:
-                    break;
-                case TokenType.WHILE:
-                    break;
-                case TokenType.EOF:
-                    break;
                 default:
                     break;
             }
 
             // Unreachable.
             return null;
+        }
+
+        public object VisitCallExpr(Call expr) {
+            object callee = Evaluate(expr.Callee);
+
+            List<object> arguments = new List<object>();
+            
+            foreach(Expr argument in expr.Arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+            
+            if (!(callee is ILoxCallable)) {
+                throw new RuntimeError(expr.Paren, "Can only call functions and classes.");
+            }
+            var function = callee as ILoxCallable;
+
+            if (arguments.Count != function.Arity()) {
+                throw new RuntimeError(expr.Paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+            }
+
+            return function.Call(this, arguments);
         }
 
         object Statements.IVisitor<object>.VisitExpressionStmt(Expression stmt)
@@ -185,85 +170,11 @@ namespace CLex
 
             switch (expr.Operator.Type)
             {
-                case TokenType.LEFT_PAREN:
-                    break;
-                case TokenType.RIGHT_PAREN:
-                    break;
-                case TokenType.LEFT_BRACE:
-                    break;
-                case TokenType.RIGHT_BRACE:
-                    break;
-                case TokenType.COMMA:
-                    break;
-                case TokenType.DOT:
-                    break;
                 case TokenType.MINUS:
                     CheckNumberOperand(expr.Operator, right);
                     return -(double)right;
-                case TokenType.PLUS:
-                    break;
-                case TokenType.SEMICOLON:
-                    break;
-                case TokenType.SLASH:
-                    break;
-                case TokenType.STAR:
-                    break;
                 case TokenType.BANG:
                     return !IsTruthy(right);
-                case TokenType.BANG_EQUAL:
-                    break;
-                case TokenType.EQUAL:
-                    break;
-                case TokenType.EQUAL_EQUAL:
-                    break;
-                case TokenType.GREATER:
-                    break;
-                case TokenType.GREATER_EQUAL:
-                    break;
-                case TokenType.LESS:
-                    break;
-                case TokenType.LESS_EQUAL:
-                    break;
-                case TokenType.IDENTIFIER:
-                    break;
-                case TokenType.STRING:
-                    break;
-                case TokenType.NUMBER:
-                    break;
-                case TokenType.AND:
-                    break;
-                case TokenType.CLASS:
-                    break;
-                case TokenType.ELSE:
-                    break;
-                case TokenType.FALSE:
-                    break;
-                case TokenType.FUN:
-                    break;
-                case TokenType.FOR:
-                    break;
-                case TokenType.IF:
-                    break;
-                case TokenType.NIL:
-                    break;
-                case TokenType.OR:
-                    break;
-                case TokenType.PRINT:
-                    break;
-                case TokenType.RETURN:
-                    break;
-                case TokenType.SUPER:
-                    break;
-                case TokenType.THIS:
-                    break;
-                case TokenType.TRUE:
-                    break;
-                case TokenType.VAR:
-                    break;
-                case TokenType.WHILE:
-                    break;
-                case TokenType.EOF:
-                    break;
                 default:
                     break;
             }
@@ -340,9 +251,18 @@ namespace CLex
             throw new NotImplementedException();
         }
 
-        object Expressions.IVisitor<object>.VisitCallExpr(Call call)
+        object Expressions.IVisitor<object>.VisitCallExpr(Call expr)
         {
-            throw new NotImplementedException();
+            Object callee = Evaluate(expr.Callee);
+
+            List<object> arguments = new List<object>();
+            foreach (Expr argument in expr.Arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+
+            var function = callee as ILoxCallable;
+            return function.Call(this, arguments);
         }
 
         object Statements.IVisitor<object>.VisitBlockStmt(Block stmt)
@@ -351,7 +271,7 @@ namespace CLex
             return null;
         }
 
-        void ExecuteBlock(List<Stmt> statements, Environment environment)
+        public void ExecuteBlock(List<Stmt> statements, Environment environment)
         {
             Environment previous = this.environment;
             try
@@ -407,6 +327,21 @@ namespace CLex
                 Execute(stmt.Body);
             }
             return null;
+        }
+
+        public object VisitFunctionStmt(Function stmt)
+        {
+            LoxFunction function = new LoxFunction(stmt, environment);
+            environment.Define(stmt.Name.Lexeme, function);
+            return null;
+        }
+
+        public object VisitReturnStmt(Statements.Return stmt)
+        {
+            object value = null;
+            if (stmt.Value != null) value = Evaluate(stmt.Value);
+
+            throw new CLex.Return(value);
         }
     }
 }

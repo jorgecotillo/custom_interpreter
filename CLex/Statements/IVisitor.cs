@@ -12,5 +12,7 @@ namespace CLex.Statements
         R VisitBlockStmt(Block stmt);
         R VisitIfStmt(If stmt);
         R VisitWhileStmt(While stmt);
+        R VisitFunctionStmt(Function function);
+        R VisitReturnStmt(Return @return);
     }
 }
