@@ -26,8 +26,9 @@ namespace CLex
     }
     internal class Interpreter : Expressions.IVisitor<object>, Statements.IVisitor<object>
     {
-        public static Environment Globals { get { return new Environment(); } }
+        public static Environment Globals = new Environment();
         private Environment environment = Globals;
+        private Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
 
         public Interpreter() {
             Globals.Define("clock", new Clock());
@@ -222,6 +223,10 @@ namespace CLex
             stmt.Accept(this);
         }
 
+        public void Resolve(Expr expr, int depth) {
+            locals[expr] = depth;
+        }
+
         object Statements.IVisitor<object>.VisitVarStmt(Statements.Var stmt)
         {
             object value = null;
@@ -236,13 +241,36 @@ namespace CLex
 
         object Expressions.IVisitor<object>.VisitVariableExpr(Variable expr)
         {
-            return environment.Get(expr.Name);
+            return LookUpVariable(expr.Name, expr);
+        }
+
+        private object LookUpVariable(Token name, Expr expr) 
+        {
+            if (locals.ContainsKey(expr)) 
+            {
+                int distance = locals[expr];
+                return environment.GetAt(distance, name.Lexeme);
+            } 
+            else 
+            {
+                return Globals.Get(name);
+            }
         }
 
         object Expressions.IVisitor<object>.VisitAssignExpr(Assign expr)
         {
             object value = Evaluate(expr.Value);
-            environment.Assign(expr.Name, value);
+            
+            if (locals.ContainsKey(expr)) 
+            {
+                int distance = locals[expr];
+                environment.AssignAt(distance, expr.Name, value);
+            }
+            else 
+            {
+                Globals.Assign(expr.Name, value);
+            }
+
             return value;
         }
 
@@ -253,7 +281,7 @@ namespace CLex
 
         object Expressions.IVisitor<object>.VisitCallExpr(Call expr)
         {
-            Object callee = Evaluate(expr.Callee);
+            object callee = Evaluate(expr.Callee);
 
             List<object> arguments = new List<object>();
             foreach (Expr argument in expr.Arguments)
