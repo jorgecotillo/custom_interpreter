@@ -75,11 +75,12 @@ namespace CLex
 
         private void ResolveLocal(Expr expr, Token name) 
         {
-            for (int i = scopes.Count - 1; i >= 0; i--)
+            // start from the innermost scope and move down from the stack
+            for (int i = 0; i < scopes.Count; i++)
             {
-                if(scopes.ElementAt(scopes.Count - 1 - i).ContainsKey(name.Lexeme))
+                if(scopes.ElementAt(i).ContainsKey(name.Lexeme))
                 {
-                    Interpreter.Resolve(expr, scopes.Count - 1 - i);
+                    Interpreter.Resolve(expr, i);
                     return;
                 }
             }
