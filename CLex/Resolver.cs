@@ -15,7 +15,7 @@ namespace CLex
     internal class Resolver : Expressions.IVisitor<object>, Statements.IVisitor<object>
     {
         Interpreter Interpreter { get; }
-        Stack<Dictionary<string, bool>> scopes = new Stack<Dictionary<string, bool>>();
+        private Stack<Dictionary<string, bool>> scopes = new Stack<Dictionary<string, bool>>();
         FunctionType currentFunction = FunctionType.NONE;
 
         public Resolver(Interpreter interpreter)
@@ -30,24 +30,24 @@ namespace CLex
             }
         }
 
-        void Resolve(Stmt stmt) {
+        private void Resolve(Stmt stmt) {
             stmt.Accept(this);
         }
 
-        void Resolve(Expr expr) {
+        private void Resolve(Expr expr) {
             expr.Accept(this);
         }
 
 
-        void BeginScope() {
+        private void BeginScope() {
             scopes.Push(new Dictionary<string, bool>());
         }
 
-        void EndScope() {
+        private void EndScope() {
             scopes.Pop();
         }
 
-        void Declare(Token name) 
+        private void Declare(Token name) 
         {
             if (scopes.Count == 0) 
             {
@@ -60,10 +60,10 @@ namespace CLex
                 Lox.Error(name, "Variable with this name already declared in this scope.");
             }
 
-            scope[name.Lexeme] = false;
+            scope.Add(name.Lexeme, false);
         }
 
-        void Define(Token name) 
+        private void Define(Token name) 
         {
             if (scopes.Count == 0) 
             {
@@ -73,11 +73,11 @@ namespace CLex
             scopes.Peek()[name.Lexeme] = true;
         }
 
-        void ResolveLocal(Expr expr, Token name) 
+        private void ResolveLocal(Expr expr, Token name) 
         {
             for (int i = scopes.Count - 1; i >= 0; i--)
             {
-                if(scopes.ElementAt(i).ContainsKey(name.Lexeme))
+                if(scopes.ElementAt(scopes.Count - 1 - i).ContainsKey(name.Lexeme))
                 {
                     Interpreter.Resolve(expr, scopes.Count - 1 - i);
                     return;
@@ -109,7 +109,7 @@ namespace CLex
             return null;
         }
         
-        void ResolveFunction(Statements.Function function, FunctionType type) 
+        private void ResolveFunction(Statements.Function function, FunctionType type) 
         {
             FunctionType enclosingFunction = currentFunction;
             currentFunction = type;

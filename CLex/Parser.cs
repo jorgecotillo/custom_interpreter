@@ -195,7 +195,7 @@ namespace CLex
             Token keyword = Previous();
             Expr value = null;
             if (!Check(TokenType.SEMICOLON)) {
-            value = Expression();
+                value = Expression();
             }
 
             Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
@@ -209,7 +209,7 @@ namespace CLex
             return new Statements.Expression(expr);
         }
 
-        private Function Function(String kind) 
+        private Function Function(string kind) 
         {
             Token name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
             Consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");

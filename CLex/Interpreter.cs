@@ -1,6 +1,7 @@
 ﻿using CLex.Expressions;
 using CLex.Statements;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -29,8 +30,8 @@ namespace CLex
         public static Environment Globals = new Environment();
         private Environment environment = Globals;
         private Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
-
-        public Interpreter() {
+        public Interpreter() 
+        {
             Globals.Define("clock", new Clock());
         }
 
@@ -250,7 +251,7 @@ namespace CLex
             {
                 int distance = locals[expr];
                 return environment.GetAt(distance, name.Lexeme);
-            } 
+            }
             else 
             {
                 return Globals.Get(name);

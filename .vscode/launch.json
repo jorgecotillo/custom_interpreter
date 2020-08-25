@@ -12,7 +12,7 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/CLex/bin/Debug/netcoreapp3.1/CLex.dll",
             "args": [
-                "${workspaceFolder}/Examples/scopedVariables.iac"
+                "${workspaceFolder}/Examples/fibonacci.iac"
             ],
             "cwd": "${workspaceFolder}/CLex",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
